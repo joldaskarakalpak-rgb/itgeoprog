@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITGEOPROG</title>
+<!-- Виджет Netlify Identity — обрабатывает приглашения и вход в панель -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+  :root {
+    --bg: #0a1826; --bg-panel: #0f2233; --bg-card: #12283b;
+    --line: #1e3a52; --steel: #4a7fa8; --amber: #f0a830;
+    --amber-dim: #c88a20; --text: #dce8f2; --text-dim: #8ba6bf; --white: #ffffff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6; overflow-x: hidden; }
+  .mono { font-family: "Consolas", "SF Mono", "Courier New", monospace; }
+
+  .log-strip { position: fixed; top: 0; left: 0; width: 54px; height: 100vh;
+    border-right: 1px solid var(--line); background: var(--bg-panel);
+    z-index: 50; display: flex; flex-direction: column; align-items: center; padding-top: 14px; }
+  .log-strip svg { flex: 1; width: 100%; }
+  .log-strip .depth-label { font-size: 8px; color: var(--text-dim);
+    writing-mode: vertical-rl; letter-spacing: 3px; padding: 10px 0; text-transform: uppercase; }
+  .wrap { margin-left: 54px; }
+  @media (max-width: 720px) { .log-strip { width: 32px; } .wrap { margin-left: 32px; } }
+
+  header { position: sticky; top: 0; background: rgba(10, 24, 38, 0.92);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); z-index: 40; }
+  nav { max-width: 1120px; margin: 0 auto; padding: 14px 32px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .logo { font-family: "Consolas", monospace; font-size: 20px; font-weight: 700;
+    letter-spacing: 1px; color: var(--white); white-space: nowrap; }
+  .logo span { color: var(--amber); }
+  .nav-links { display: flex; gap: 22px; flex: 1; }
+  .nav-links a { color: var(--text-dim); text-decoration: none;
+    font-size: 14px; transition: color .2s; white-space: nowrap; }
+  .nav-links a:hover { color: var(--amber); }
+  @media (max-width: 900px) { .nav-links { display: none; } }
+
+  .lang-switch { display: flex; gap: 4px; background: var(--bg-card);
+    border: 1px solid var(--line); border-radius: 5px; padding: 3px; }
+  .lang-switch button { background: transparent; border: none; cursor: pointer;
+    color: var(--text-dim); font-size: 12px; font-weight: 600;
+    padding: 5px 10px; border-radius: 3px; transition: all .2s; font-family: "Consolas", monospace; }
+  .lang-switch button.active { background: var(--amber); color: #1a1206; }
+  .lang-switch button:hover:not(.active) { color: var(--amber); }
+
+  .hero { max-width: 1120px; margin: 0 auto; padding: 84px 32px 60px; }
+  .eyebrow { font-family: "Consolas", monospace; font-size: 13px; letter-spacing: 3px;
+    color: var(--amber); text-transform: uppercase; margin-bottom: 20px; }
+  .hero h1 { font-size: clamp(36px, 5.5vw, 62px); line-height: 1.06; font-weight: 800;
+    color: var(--white); letter-spacing: -1px; margin-bottom: 22px; }
+  .hero h1 .accent { color: var(--amber); }
+  .hero p.lead { font-size: clamp(16px, 2.2vw, 20px); color: var(--text-dim);
+    max-width: 640px; margin-bottom: 34px; }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 14px 26px;
+    border-radius: 4px; font-size: 15px; font-weight: 600; text-decoration: none;
+    transition: all .2s; cursor: pointer; border: none; }
+  .btn-primary { background: var(--amber); color: #1a1206; }
+  .btn-primary:hover { background: var(--amber-dim); transform: translateY(-2px); }
+  .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+  section { max-width: 1120px; margin: 0 auto; padding: 64px 32px; }
+  .section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 40px;
+    border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+  .section-head .idx { font-family: "Consolas", monospace; font-size: 13px;
+    color: var(--amber); letter-spacing: 2px; }
+  .section-head h2 { font-size: clamp(24px, 4vw, 36px); color: var(--white);
+    font-weight: 700; letter-spacing: -0.5px; }
+
+  .programs { display: grid; grid-template-columns: 1fr; gap: 22px; }
+  .prog-card { background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 30px; display: grid;
+    grid-template-columns: auto 1fr auto; gap: 26px; align-items: center;
+    transition: border-color .25s, transform .25s; }
+  .prog-card:hover { border-color: var(--steel); transform: translateY(-3px); }
+  .prog-icon { width: 68px; height: 68px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--steel), var(--bg-panel));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; border: 1px solid var(--line); }
+  .prog-info h3 { font-size: 21px; color: var(--white); margin-bottom: 6px; font-weight: 700; }
+  .prog-info .ver { font-family: "Consolas", monospace; font-size: 12px; color: var(--amber); margin-bottom: 10px; }
+  .prog-info p { color: var(--text-dim); font-size: 15px; max-width: 540px; }
+  .prog-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .tag { font-family: "Consolas", monospace; font-size: 11px; color: var(--steel);
+    border: 1px solid var(--line); padding: 3px 10px; border-radius: 3px; }
+  .prog-action { display: flex; flex-direction: column; gap: 10px; }
+  @media (max-width: 760px) { .prog-card { grid-template-columns: 1fr; } .prog-action { flex-direction: row; } }
+  .prog-card.soon { opacity: 0.6; border-style: dashed; }
+  .prog-card.soon .prog-icon { background: var(--bg-panel); }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 860px) { .grid-3 { grid-template-columns: 1fr; } }
+  .svc-card { background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 30px; transition: border-color .25s, transform .25s; }
+  .svc-card:hover { border-color: var(--steel); transform: translateY(-3px); }
+  .svc-card .svc-icon { width: 56px; height: 56px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--steel), var(--bg-panel));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin-bottom: 18px; border: 1px solid var(--line); }
+  .svc-card h3 { font-size: 19px; color: var(--white); margin-bottom: 10px; font-weight: 700; }
+  .svc-card p { color: var(--text-dim); font-size: 14px; }
+  .svc-card ul { list-style: none; margin-top: 14px; }
+  .svc-card ul li { color: var(--text-dim); font-size: 14px; padding: 5px 0 5px 20px; position: relative; }
+  .svc-card ul li::before { content: "\25B8"; color: var(--amber); position: absolute; left: 0; }
+
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  @media (max-width: 760px) { .about-grid { grid-template-columns: 1fr; } }
+  .about-text p { color: var(--text-dim); margin-bottom: 16px; }
+  .about-text strong { color: var(--text); }
+  .dev-card { background: var(--bg-panel); border: 1px solid var(--line);
+    border-left: 3px solid var(--amber); border-radius: 6px; padding: 28px; }
+  .dev-card .dev-name { font-size: 18px; color: var(--white); font-weight: 700; margin-bottom: 6px; }
+  .dev-card .dev-role { font-size: 13px; color: var(--amber); font-family: "Consolas", monospace; margin-bottom: 20px; }
+  .dev-row { display: flex; align-items: center; gap: 12px; padding: 10px 0;
+    border-top: 1px solid var(--line); font-size: 15px; }
+  .dev-row .ico { color: var(--steel); font-size: 18px; width: 24px; text-align: center; }
+  .dev-row a { color: var(--text); text-decoration: none; }
+  .dev-row a:hover { color: var(--amber); }
+
+  .contact-band { background: var(--bg-panel); border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line); margin-top: 40px; }
+  .contact-inner { max-width: 1120px; margin: 0 auto; padding: 54px 32px; text-align: center; }
+  .contact-inner h2 { font-size: clamp(24px, 4vw, 34px); color: var(--white); margin-bottom: 14px; }
+  .contact-inner p { color: var(--text-dim); margin-bottom: 28px; }
+  .contact-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+  footer { max-width: 1120px; margin: 0 auto; padding: 32px; display: flex;
+    justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    color: var(--text-dim); font-size: 13px; }
+  footer .mono { color: var(--steel); }
+
+  /* ── Новости ── */
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+  .news-card { background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 8px; overflow: hidden; transition: border-color .25s, transform .25s;
+    display: flex; flex-direction: column; }
+  .news-card:hover { border-color: var(--steel); transform: translateY(-3px); }
+  .news-card img { width: 100%; height: 180px; object-fit: cover; display: block;
+    border-bottom: 1px solid var(--line); }
+  .news-body { padding: 22px; flex: 1; display: flex; flex-direction: column; }
+  .news-date { font-family: "Consolas", monospace; font-size: 11px;
+    color: var(--amber); margin-bottom: 8px; }
+  .news-card h3 { font-size: 18px; color: var(--white); margin-bottom: 8px; font-weight: 700; }
+  .news-card p { color: var(--text-dim); font-size: 14px; flex: 1; }
+  .news-empty { color: var(--text-dim); font-size: 15px; padding: 20px 0; }
+
+  /* ── Карточки товаров с фото ── */
+  .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 24px; }
+  .prod-card { background: var(--bg-card); border: 1px solid var(--line);
+    border-radius: 8px; overflow: hidden; transition: border-color .25s, transform .25s; }
+  .prod-card:hover { border-color: var(--steel); transform: translateY(-3px); }
+  .prod-card img { width: 100%; height: 190px; object-fit: cover; display: block;
+    background: var(--bg-panel); border-bottom: 1px solid var(--line); }
+  .prod-body { padding: 18px; }
+  .prod-body h4 { font-size: 16px; color: var(--white); margin-bottom: 6px; font-weight: 700; }
+  .prod-body p { color: var(--text-dim); font-size: 13px; margin-bottom: 10px; }
+  .prod-price { font-family: "Consolas", monospace; font-size: 14px;
+    color: var(--amber); font-weight: 700; }
+  .prod-stock { font-size: 11px; color: #88cc88; margin-left: 8px; }
+  .prod-stock.out { color: #d88; }
+
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s, transform .6s; }
+  .reveal.show { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="log-strip" aria-hidden="true">
+  <div class="depth-label" data-i18n="side_label">ГК · каротаж</div>
+  <svg viewBox="0 0 40 800" preserveAspectRatio="none">
+    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0a830" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#4a7fa8" stop-opacity="0.5"/>
+    </linearGradient></defs>
+    <g stroke="#1e3a52" stroke-width="1">
+      <line x1="0" y1="100" x2="40" y2="100"/><line x1="0" y1="200" x2="40" y2="200"/>
+      <line x1="0" y1="300" x2="40" y2="300"/><line x1="0" y1="400" x2="40" y2="400"/>
+      <line x1="0" y1="500" x2="40" y2="500"/><line x1="0" y1="600" x2="40" y2="600"/>
+      <line x1="0" y1="700" x2="40" y2="700"/>
+    </g>
+    <path d="M20,0 L18,40 L26,70 L14,110 L22,150 L30,180 L16,220 L24,260
+             L12,300 L28,340 L20,380 L32,410 L15,450 L25,490 L18,530
+             L30,570 L14,610 L26,650 L20,690 L24,730 L16,770 L22,800"
+          fill="none" stroke="url(#lg)" stroke-width="2"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <header>
+    <nav>
+      <div class="logo">IT<span>GEO</span>PROG</div>
+      <div class="nav-links">
+        <a href="#programs" data-i18n="nav_programs">Программы</a>
+        <a href="#goods" data-i18n="nav_goods">Товары</a>
+        <a href="#services" data-i18n="nav_services">Услуги</a>
+        <a href="#news" data-i18n="nav_news">Новости</a>
+        <a href="#about" data-i18n="nav_about">О нас</a>
+        <a href="#contact" data-i18n="nav_contact">Контакты</a>
+      </div>
+      <div class="lang-switch">
+        <button data-lang="ru" class="active">RU</button>
+        <button data-lang="uz">UZ</button>
+        <button data-lang="kaa">QQ</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow" data-i18n="hero_eyebrow">Геофизика · Электроника · Разработка</div>
+    <h1 data-i18n="hero_title">Программы, приборы и <span class="accent">инженерные решения</span></h1>
+    <p class="lead" data-i18n="hero_lead">Программное обеспечение для каротажных данных, товары и запчасти для геофизики и электроники, ремонт приборов и разработка электронных устройств под заказ.</p>
+    <div class="hero-actions">
+      <a href="#programs" class="btn btn-primary" data-i18n="hero_btn1">Смотреть программы →</a>
+      <a href="#contact" class="btn btn-ghost" data-i18n="hero_btn2">Связаться</a>
+    </div>
+  </div>
+
+  <section id="programs">
+    <div class="section-head"><span class="idx">01</span><h2 data-i18n="sec_programs">Программы</h2></div>
+    <div class="programs">
+      <div class="prog-card reveal">
+        <div class="prog-icon">⛏</div>
+        <div class="prog-info">
+          <h3>Vulkan-SFP module</h3>
+          <div class="ver mono" data-i18n="prog_vulkan_ver">версия 1.0 · Windows</div>
+          <p data-i18n="prog_vulkan_desc">Конвертер геофизических данных LAS в формат SFP. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации.</p>
+          <div class="prog-tags">
+            <span class="tag">LAS → SFP</span>
+            <span class="tag" data-i18n="tag_auto">Автообработка</span>
+            <span class="tag">GPS</span><span class="tag">FTP</span>
+          </div>
+        </div>
+        <div class="prog-action">
+          <a href="#contact" class="btn btn-primary" data-i18n="btn_get">Получить</a>
+        </div>
+      </div>
+      <div class="prog-card soon reveal">
+        <div class="prog-icon">➕</div>
+        <div class="prog-info">
+          <h3 data-i18n="prog_soon_title">Скоро новые программы</h3>
+          <div class="ver mono" data-i18n="prog_soon_ver">в разработке</div>
+          <p data-i18n="prog_soon_desc">Здесь появятся новые инструменты для работы с геофизическими данными.</p>
+        </div>
+        <div class="prog-action">
+          <span class="btn btn-ghost" style="cursor:default;opacity:.5" data-i18n="btn_soon">Скоро</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="goods">
+    <div class="section-head"><span class="idx">02</span><h2 data-i18n="sec_goods">Товары и запчасти</h2></div>
+    <div class="grid-3">
+      <div class="svc-card reveal">
+        <div class="svc-icon">🛠</div>
+        <h3 data-i18n="goods_geo_title">Для геофизики</h3>
+        <p data-i18n="goods_geo_desc">Оборудование, запчасти и комплектующие для каротажных работ.</p>
+        <ul>
+          <li data-i18n="goods_geo_1">Скважинные приборы и датчики</li>
+          <li data-i18n="goods_geo_2">Кабели и разъёмы</li>
+          <li data-i18n="goods_geo_3">Запчасти к каротажным станциям</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">🔌</div>
+        <h3 data-i18n="goods_el_title">Для электроники</h3>
+        <p data-i18n="goods_el_desc">Электронные компоненты и материалы для сборки и ремонта.</p>
+        <ul>
+          <li data-i18n="goods_el_1">Микросхемы и модули</li>
+          <li data-i18n="goods_el_2">Платы, датчики, разъёмы</li>
+          <li data-i18n="goods_el_3">Расходные материалы</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">📦</div>
+        <h3 data-i18n="goods_order_title">Под заказ</h3>
+        <p data-i18n="goods_order_desc">Поиск и поставка нужных деталей и оборудования по запросу.</p>
+        <ul>
+          <li data-i18n="goods_order_1">Редкие комплектующие</li>
+          <li data-i18n="goods_order_2">Оборудование под задачу</li>
+          <li data-i18n="goods_order_3">Консультация по подбору</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="section-head"><span class="idx">03</span><h2 data-i18n="sec_services">Услуги</h2></div>
+    <div class="grid-3">
+      <div class="svc-card reveal">
+        <div class="svc-icon">🔧</div>
+        <h3 data-i18n="svc_repair_title">Ремонт приборов</h3>
+        <p data-i18n="svc_repair_desc">Обслуживание и ремонт геофизических приборов и каротажного оборудования.</p>
+        <ul>
+          <li data-i18n="svc_repair_1">Диагностика неисправностей</li>
+          <li data-i18n="svc_repair_2">Ремонт скважинных приборов</li>
+          <li data-i18n="svc_repair_3">Калибровка и настройка</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">💡</div>
+        <h3 data-i18n="svc_dev_title">Разработка электроники</h3>
+        <p data-i18n="svc_dev_desc">Проектирование и создание электронных устройств для любых сфер.</p>
+        <ul>
+          <li data-i18n="svc_dev_1">Электронные схемы и платы</li>
+          <li data-i18n="svc_dev_2">Прошивки и микроконтроллеры</li>
+          <li data-i18n="svc_dev_3">Автоматизация и датчики</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">⚙</div>
+        <h3 data-i18n="svc_custom_title">Оборудование под заказ</h3>
+        <p data-i18n="svc_custom_desc">Специальное оборудование и устройства по вашему техническому заданию.</p>
+        <ul>
+          <li data-i18n="svc_custom_1">Индивидуальные решения</li>
+          <li data-i18n="svc_custom_2">Опытные образцы</li>
+          <li data-i18n="svc_custom_3">Мелкосерийное производство</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- НОВОСТИ (загружаются из админ-панели) -->
+  <section id="news">
+    <div class="section-head"><span class="idx">04</span><h2 data-i18n="sec_news">Новости</h2></div>
+    <div id="news-list" class="news-grid">
+      <div class="news-empty" data-i18n="news_empty">Новостей пока нет.</div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="section-head"><span class="idx">05</span><h2 data-i18n="sec_about">О нас</h2></div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p data-i18n="about_p1"><strong>ITGEOPROG</strong> — программы, приборы и инженерные решения для геофизики и электроники.</p>
+        <p data-i18n="about_p2">Мы создаём программное обеспечение, поставляем товары и запчасти, ремонтируем приборы и разрабатываем электронные устройства под заказ для любых сфер.</p>
+        <p data-i18n="about_p3">Работаем на основе реального опыта полевых и камеральных работ. Нужна программа, деталь, ремонт или разработка — свяжитесь с нами.</p>
+      </div>
+      <div class="dev-card">
+        <div class="dev-name">Ерназаров Жолдасбай Курбанбаевич</div>
+        <div class="dev-role mono" data-i18n="dev_role">разработчик · геофизик · инженер</div>
+        <div class="dev-row"><span class="ico">✆</span><a href="tel:+998907003038">+998 90 700 30 38</a></div>
+        <div class="dev-row"><span class="ico">✈</span><a href="https://t.me/+998907003038" data-i18n="dev_tg">Telegram</a></div>
+        <div class="dev-row"><span class="ico">◉</span><span data-i18n="dev_loc">Узбекистан</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="contact-band" id="contact">
+  <div class="contact-inner">
+    <h2 data-i18n="contact_title">Нужна программа, деталь или ремонт?</h2>
+    <p data-i18n="contact_desc">Свяжитесь с нами — обсудим вашу задачу и подберём решение.</p>
+    <div class="contact-btns">
+      <a href="tel:+998907003038" class="btn btn-primary">✆ +998 90 700 30 38</a>
+      <a href="https://t.me/+998907003038" class="btn btn-ghost" data-i18n="contact_tg">✈ Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <div class="logo" style="font-size:16px">IT<span style="color:var(--amber)">GEO</span>PROG</div>
+    <div class="mono" data-i18n="footer_text">© 2026 · Ерназаров Ж.К. · Геофизика и электроника</div>
+  </footer>
+</div>
+
+<script>
+  const I18N = {
+    ru: {
+      side_label: "ГК · каротаж",
+      nav_programs: "Программы", nav_goods: "Товары", nav_services: "Услуги",
+      nav_news: "Новости", sec_news: "Новости", news_empty: "Новостей пока нет.",
+      nav_about: "О нас", nav_contact: "Контакты",
+      hero_eyebrow: "Геофизика · Электроника · Разработка",
+      hero_title: 'Программы, приборы и <span class="accent">инженерные решения</span>',
+      hero_lead: "Программное обеспечение для каротажных данных, товары и запчасти для геофизики и электроники, ремонт приборов и разработка электронных устройств под заказ.",
+      hero_btn1: "Смотреть программы →", hero_btn2: "Связаться",
+      sec_programs: "Программы",
+      prog_vulkan_ver: "версия 1.0 · Windows",
+      prog_vulkan_desc: "Конвертер геофизических данных LAS в формат SFP. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации.",
+      tag_auto: "Автообработка", btn_get: "Получить",
+      prog_soon_title: "Скоро новые программы", prog_soon_ver: "в разработке",
+      prog_soon_desc: "Здесь появятся новые инструменты для работы с геофизическими данными.",
+      btn_soon: "Скоро",
+      sec_goods: "Товары и запчасти",
+      goods_geo_title: "Для геофизики",
+      goods_geo_desc: "Оборудование, запчасти и комплектующие для каротажных работ.",
+      goods_geo_1: "Скважинные приборы и датчики", goods_geo_2: "Кабели и разъёмы",
+      goods_geo_3: "Запчасти к каротажным станциям",
+      goods_el_title: "Для электроники",
+      goods_el_desc: "Электронные компоненты и материалы для сборки и ремонта.",
+      goods_el_1: "Микросхемы и модули", goods_el_2: "Платы, датчики, разъёмы",
+      goods_el_3: "Расходные материалы",
+      goods_order_title: "Под заказ",
+      goods_order_desc: "Поиск и поставка нужных деталей и оборудования по запросу.",
+      goods_order_1: "Редкие комплектующие", goods_order_2: "Оборудование под задачу",
+      goods_order_3: "Консультация по подбору",
+      sec_services: "Услуги",
+      svc_repair_title: "Ремонт приборов",
+      svc_repair_desc: "Обслуживание и ремонт геофизических приборов и каротажного оборудования.",
+      svc_repair_1: "Диагностика неисправностей", svc_repair_2: "Ремонт скважинных приборов",
+      svc_repair_3: "Калибровка и настройка",
+      svc_dev_title: "Разработка электроники",
+      svc_dev_desc: "Проектирование и создание электронных устройств для любых сфер.",
+      svc_dev_1: "Электронные схемы и платы", svc_dev_2: "Прошивки и микроконтроллеры",
+      svc_dev_3: "Автоматизация и датчики",
+      svc_custom_title: "Оборудование под заказ",
+      svc_custom_desc: "Специальное оборудование и устройства по вашему техническому заданию.",
+      svc_custom_1: "Индивидуальные решения", svc_custom_2: "Опытные образцы",
+      svc_custom_3: "Мелкосерийное производство",
+      sec_about: "О нас",
+      about_p1: "<strong>ITGEOPROG</strong> — программы, приборы и инженерные решения для геофизики и электроники.",
+      about_p2: "Мы создаём программное обеспечение, поставляем товары и запчасти, ремонтируем приборы и разрабатываем электронные устройства под заказ для любых сфер.",
+      about_p3: "Работаем на основе реального опыта полевых и камеральных работ. Нужна программа, деталь, ремонт или разработка — свяжитесь с нами.",
+      dev_role: "разработчик · геофизик · инженер", dev_tg: "Telegram", dev_loc: "Узбекистан",
+      contact_title: "Нужна программа, деталь или ремонт?",
+      contact_desc: "Свяжитесь с нами — обсудим вашу задачу и подберём решение.",
+      contact_tg: "✈ Написать в Telegram",
+      footer_text: "© 2026 · Ерназаров Ж.К. · Геофизика и электроника"
+    },
+    uz: {
+      side_label: "GK · karotaj",
+      nav_programs: "Dasturlar", nav_goods: "Mahsulotlar", nav_services: "Xizmatlar",
+      nav_news: "Yangiliklar", sec_news: "Yangiliklar", news_empty: "Hozircha yangiliklar yo'q.",
+      nav_about: "Biz haqimizda", nav_contact: "Aloqa",
+      hero_eyebrow: "Geofizika · Elektronika · Ishlab chiqish",
+      hero_title: 'Dasturlar, asboblar va <span class="accent">muhandislik yechimlari</span>',
+      hero_lead: "Karotaj ma'lumotlari uchun dasturiy ta'minot, geofizika va elektronika uchun mahsulotlar va ehtiyot qismlar, asboblarni ta'mirlash hamda buyurtma asosida elektron qurilmalar ishlab chiqish.",
+      hero_btn1: "Dasturlarni ko'rish →", hero_btn2: "Bog'lanish",
+      sec_programs: "Dasturlar",
+      prog_vulkan_ver: "versiya 1.0 · Windows",
+      prog_vulkan_desc: "Geofizik LAS ma'lumotlarini SFP formatiga o'giruvchi dastur. Papkalarni avtomatik qayta ishlash, quduq GPS-koordinatalari, FTP-serverga yuborish, Excel-xaritalar va tahrirlanadigan qoidalar.",
+      tag_auto: "Avto qayta ishlash", btn_get: "Olish",
+      prog_soon_title: "Tez orada yangi dasturlar", prog_soon_ver: "ishlab chiqilmoqda",
+      prog_soon_desc: "Bu yerda geofizik ma'lumotlar bilan ishlash uchun yangi vositalar paydo bo'ladi.",
+      btn_soon: "Tez orada",
+      sec_goods: "Mahsulotlar va ehtiyot qismlar",
+      goods_geo_title: "Geofizika uchun",
+      goods_geo_desc: "Karotaj ishlari uchun uskunalar, ehtiyot qismlar va butlovchilar.",
+      goods_geo_1: "Quduq asboblari va datchiklar", goods_geo_2: "Kabellar va ulagichlar",
+      goods_geo_3: "Karotaj stansiyalari uchun ehtiyot qismlar",
+      goods_el_title: "Elektronika uchun",
+      goods_el_desc: "Yig'ish va ta'mirlash uchun elektron komponentlar va materiallar.",
+      goods_el_1: "Mikrosxemalar va modullar", goods_el_2: "Platalar, datchiklar, ulagichlar",
+      goods_el_3: "Sarf materiallari",
+      goods_order_title: "Buyurtma asosida",
+      goods_order_desc: "Kerakli detallar va uskunalarni so'rov bo'yicha topish va yetkazib berish.",
+      goods_order_1: "Noyob butlovchilar", goods_order_2: "Vazifaga mos uskuna",
+      goods_order_3: "Tanlash bo'yicha maslahat",
+      sec_services: "Xizmatlar",
+      svc_repair_title: "Asboblarni ta'mirlash",
+      svc_repair_desc: "Geofizik asboblar va karotaj uskunalarini texnik xizmat ko'rsatish va ta'mirlash.",
+      svc_repair_1: "Nosozliklarni aniqlash", svc_repair_2: "Quduq asboblarini ta'mirlash",
+      svc_repair_3: "Kalibrlash va sozlash",
+      svc_dev_title: "Elektronika ishlab chiqish",
+      svc_dev_desc: "Har qanday soha uchun elektron qurilmalarni loyihalash va yaratish.",
+      svc_dev_1: "Elektron sxemalar va platalar", svc_dev_2: "Proshivkalar va mikrokontrollerlar",
+      svc_dev_3: "Avtomatlashtirish va datchiklar",
+      svc_custom_title: "Buyurtma uskunalari",
+      svc_custom_desc: "Sizning texnik topshirig'ingiz asosida maxsus uskunalar va qurilmalar.",
+      svc_custom_1: "Individual yechimlar", svc_custom_2: "Tajriba namunalari",
+      svc_custom_3: "Kichik seriyali ishlab chiqarish",
+      sec_about: "Biz haqimizda",
+      about_p1: "<strong>ITGEOPROG</strong> — geofizika va elektronika uchun dasturlar, asboblar va muhandislik yechimlari.",
+      about_p2: "Biz dasturiy ta'minot yaratamiz, mahsulot va ehtiyot qismlar yetkazamiz, asboblarni ta'mirlaymiz va har qanday soha uchun elektron qurilmalarni buyurtma asosida ishlab chiqamiz.",
+      about_p3: "Dala va kameral ishlarning haqiqiy tajribasiga tayanamiz. Dastur, detal, ta'mir yoki ishlab chiqish kerakmi — biz bilan bog'laning.",
+      dev_role: "dasturchi · geofizik · muhandis", dev_tg: "Telegram", dev_loc: "O'zbekiston",
+      contact_title: "Dastur, detal yoki ta'mir kerakmi?",
+      contact_desc: "Biz bilan bog'laning — vazifangizni muhokama qilib, yechim topamiz.",
+      contact_tg: "✈ Telegramga yozish",
+      footer_text: "© 2026 · Ernazarov J.Q. · Geofizika va elektronika"
+    },
+    kaa: {
+      side_label: "GK · karotaj",
+      nav_programs: "Bag'darlamalar", nav_goods: "Ónimler", nav_services: "Xızmetler",
+      nav_news: "Jańalıqlar", sec_news: "Jańalıqlar", news_empty: "Házirshe jańalıqlar joq.",
+      nav_about: "Biz haqqımızda", nav_contact: "Baylanıs",
+      hero_eyebrow: "Geofizika · Elektronika · Islep shıg'ıw",
+      hero_title: 'Bag\'darlamalar, ásbaplar hám <span class="accent">injenerlik sheshimleri</span>',
+      hero_lead: "Karotaj mag'lıwmatları ushın bag'darlamalıq támiynat, geofizika hám elektronika ushın ónimler hám zápas bólekler, ásbaplardı jóndew hám buyırtpa boyınsha elektron qurılmalar islep shıg'ıw.",
+      hero_btn1: "Bag'darlamalardı kóriw →", hero_btn2: "Baylanısıw",
+      sec_programs: "Bag'darlamalar",
+      prog_vulkan_ver: "versiya 1.0 · Windows",
+      prog_vulkan_desc: "Geofizikalıq LAS mag'lıwmatların SFP formatına aylandırıwshı bag'darlama. Papkalardı avtomat qayta islew, qudıq GPS-koordinataları, FTP-serverge jiberiw, Excel-kartalar hám ózgertiletug'ın qag'ıydalar.",
+      tag_auto: "Avto qayta islew", btn_get: "Alıw",
+      prog_soon_title: "Tez arada jańa bag'darlamalar", prog_soon_ver: "islep shıg'ılmaqta",
+      prog_soon_desc: "Bul jerde geofizikalıq mag'lıwmatlar menen islew ushın jańa qurallar payda boladı.",
+      btn_soon: "Tez arada",
+      sec_goods: "Ónimler hám zápas bólekler",
+      goods_geo_title: "Geofizika ushın",
+      goods_geo_desc: "Karotaj jumısları ushın úskeneler, zápas bólekler hám butlawshılar.",
+      goods_geo_1: "Qudıq ásbapları hám datchikler", goods_geo_2: "Kabeller hám jalg'awshılar",
+      goods_geo_3: "Karotaj stansiyaları ushın zápas bólekler",
+      goods_el_title: "Elektronika ushın",
+      goods_el_desc: "Jıynaw hám jóndew ushın elektron komponentler hám materiallar.",
+      goods_el_1: "Mikrosxemalar hám modullar", goods_el_2: "Platalar, datchikler, jalg'awshılar",
+      goods_el_3: "Sarp materialları",
+      goods_order_title: "Buyırtpa boyınsha",
+      goods_order_desc: "Kerekli bólekler hám úskenelerdi soraw boyınsha tabıw hám jetkerip beriw.",
+      goods_order_1: "Sıyrek butlawshılar", goods_order_2: "Wazıypag'a mas úskene",
+      goods_order_3: "Tańlaw boyınsha másláhát",
+      sec_services: "Xızmetler",
+      svc_repair_title: "Ásbaplardı jóndew",
+      svc_repair_desc: "Geofizikalıq ásbaplar hám karotaj úskenelerin texnikalıq xızmet kórsetiw hám jóndew.",
+      svc_repair_1: "Nasazlıqlardı anıqlaw", svc_repair_2: "Qudıq ásbapların jóndew",
+      svc_repair_3: "Kalibrlew hám sazlaw",
+      svc_dev_title: "Elektronika islep shıg'ıw",
+      svc_dev_desc: "Qálegen tarawlar ushın elektron qurılmalardı joybarlaw hám jaratıw.",
+      svc_dev_1: "Elektron sxemalar hám platalar", svc_dev_2: "Proshivkalar hám mikrokontrollerler",
+      svc_dev_3: "Avtomatlastırıw hám datchikler",
+      svc_custom_title: "Buyırtpa úskeneleri",
+      svc_custom_desc: "Sizdiń texnikalıq tapsırmańız boyınsha arnawlı úskeneler hám qurılmalar.",
+      svc_custom_1: "Individual sheshimler", svc_custom_2: "Tájiriybe úlgileri",
+      svc_custom_3: "Kishi seriyalı islep shıg'arıw",
+      sec_about: "Biz haqqımızda",
+      about_p1: "<strong>ITGEOPROG</strong> — geofizika hám elektronika ushın bag'darlamalar, ásbaplar hám injenerlik sheshimleri.",
+      about_p2: "Biz bag'darlamalıq támiynat jaratamız, ónim hám zápas bólekler jetkeremiz, ásbaplardı jóndeymiz hám qálegen taraw ushın elektron qurılmalardı buyırtpa boyınsha islep shıg'amız.",
+      about_p3: "Dala hám kameral jumıslardıń haqıyqıy tájiriybesine súyenemiz. Bag'darlama, bólek, jóndew yamasa islep shıg'ıw kerek pe — biz benen baylanısıń.",
+      dev_role: "dasturshı · geofizik · injener", dev_tg: "Telegram", dev_loc: "Qaraqalpaqstan",
+      contact_title: "Bag'darlama, bólek yamasa jóndew kerek pe?",
+      contact_desc: "Biz benen baylanısıń — wazıypańızdı dodalasıp, sheshim tabamız.",
+      contact_tg: "✈ Telegramg'a jazıw",
+      footer_text: "© 2026 · Ernazarov J.Q. · Geofizika hám elektronika"
+    }
+  };
+
+  function setLang(lang) {
+    const dict = I18N[lang] || I18N.ru;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key] !== undefined) {
+        if (dict[key].indexOf('<') !== -1) el.innerHTML = dict[key];
+        else el.textContent = dict[key];
+      }
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll('.lang-switch button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+  }
+  document.querySelectorAll('.lang-switch button').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
+  });
+  // ── Загрузка контента из админ-панели ──
+  // Панель сохраняет каждую запись отдельным .md файлом.
+  // Список файлов берём из локального индекса (без GitHub API,
+  // чтобы не упираться в лимиты запросов).
+
+  // Разбор Markdown с front matter (--- ключ: значение ---)
+  function parseMd(text) {
+    const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+    if (!m) return { body: text };
+    const data = { body: (m[2] || '').trim() };
+    m[1].split('\n').forEach(line => {
+      const i = line.indexOf(':');
+      if (i < 0) return;
+      const key = line.slice(0, i).trim();
+      let val = line.slice(i + 1).trim();
+      val = val.replace(/^["']|["']$/g, '');
+      if (val === 'true') val = true;
+      else if (val === 'false') val = false;
+      data[key] = val;
+    });
+    return data;
+  }
+
+  async function loadFolder(folder, indexFile) {
+    try {
+      // Читаем список файлов из индекса
+      const r = await fetch('/' + indexFile + '?v=' + Date.now());
+      if (!r.ok) return [];
+      const names = await r.json();
+      if (!Array.isArray(names)) return [];
+
+      const items = await Promise.all(names.map(async name => {
+        try {
+          const res = await fetch(`/${folder}/${name}?v=` + Date.now());
+          return res.ok ? parseMd(await res.text()) : null;
+        } catch (e) { return null; }
+      }));
+      return items.filter(Boolean);
+    } catch (e) { return []; }
+  }
+
+  async function loadContent() {
+    const news = await loadFolder('content/news', 'content/news-index.json');
+    renderNews(news.filter(n => n.published !== false));
+
+    const products = await loadFolder('content/products', 'content/products-index.json');
+    renderProducts(products.filter(p => p.published !== false));
+  }
+
+  function renderNews(items) {
+    const box = document.getElementById('news-list');
+    if (!box || !items.length) return;
+    items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    box.innerHTML = items.map(n => `
+      <article class="news-card reveal show">
+        ${n.image ? `<img src="${n.image}" alt="">` : ''}
+        <div class="news-body">
+          <div class="news-date">${formatDate(n.date)}</div>
+          <h3>${escapeHtml(n.title || '')}</h3>
+          <p>${escapeHtml(n.summary || '')}</p>
+        </div>
+      </article>`).join('');
+  }
+
+  function renderProducts(items) {
+    // Раскладываем товары по категориям в раздел «Товары»
+    const cats = { geo: [], electronics: [], order: [] };
+    items.forEach(p => { if (cats[p.category]) cats[p.category].push(p); });
+
+    const goods = document.getElementById('goods');
+    if (!goods) return;
+    // Убираем старый блок товаров, если был
+    let grid = goods.querySelector('.prod-grid');
+    if (!grid) {
+      grid = document.createElement('div');
+      grid.className = 'prod-grid';
+      goods.appendChild(grid);
+    }
+    const all = [...cats.geo, ...cats.electronics, ...cats.order];
+    if (!all.length) return;
+    grid.innerHTML = all.map(p => `
+      <div class="prod-card reveal show">
+        ${p.image ? `<img src="${p.image}" alt="">` : ''}
+        <div class="prod-body">
+          <h4>${escapeHtml(p.title || '')}</h4>
+          <p>${escapeHtml(p.summary || '')}</p>
+          ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
+          <span class="prod-stock${p.in_stock === false ? ' out' : ''}">
+            ${p.in_stock === false ? 'нет в наличии' : 'в наличии'}
+          </span>
+        </div>
+      </div>`).join('');
+  }
+
+  function formatDate(d) {
+    if (!d) return '';
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  loadContent();
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+<script>
+  // Обработка приглашения в админ-панель:
+  // после задания пароля перенаправляем в /admin
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('init', user => {
+      if (!user) {
+        window.netlifyIdentity.on('login', () => {
+          document.location.href = '/admin/';
+        });
+      }
+    });
+  }
+</script>
+</body>
+</html>
