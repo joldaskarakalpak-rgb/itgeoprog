@@ -553,25 +553,58 @@
     btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
   });
   // ── Загрузка контента из админ-панели ──
-  // Читает JSON-файлы, которые генерирует CMS
-  async function loadContent() {
-    // Новости
-    try {
-      const r = await fetch('/content/news.json');
-      if (r.ok) {
-        const items = await r.json();
-        renderNews(items.filter(n => n.published !== false));
-      }
-    } catch (e) { /* нет файла — показываем «новостей пока нет» */ }
+  // Панель сохраняет каждую запись отдельным .md файлом.
+  // Читаем список файлов через GitHub API, затем сами файлы.
+  const GH_USER = 'joldaskarakalpak-rgb';   // ваш логин GitHub
+  const GH_REPO = 'itgeoprog';              // название репозитория
 
-    // Товары
+  async function ghList(folder) {
+    const url = `https://api.github.com/repos/${GH_USER}/${GH_REPO}/contents/${folder}`;
+    const r = await fetch(url);
+    if (!r.ok) return [];
+    const files = await r.json();
+    return Array.isArray(files)
+      ? files.filter(f => f.name.endsWith('.md')).map(f => f.download_url)
+      : [];
+  }
+
+  // Разбор Markdown с front matter (--- ключ: значение ---)
+  function parseMd(text) {
+    const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
+    if (!m) return { body: text };
+    const data = { body: (m[2] || '').trim() };
+    m[1].split('\n').forEach(line => {
+      const i = line.indexOf(':');
+      if (i < 0) return;
+      const key = line.slice(0, i).trim();
+      let val = line.slice(i + 1).trim();
+      val = val.replace(/^["']|["']$/g, '');
+      if (val === 'true') val = true;
+      else if (val === 'false') val = false;
+      data[key] = val;
+    });
+    return data;
+  }
+
+  async function loadFolder(folder) {
     try {
-      const r = await fetch('/content/products.json');
-      if (r.ok) {
-        const items = await r.json();
-        renderProducts(items.filter(p => p.published !== false));
-      }
-    } catch (e) { /* пропускаем */ }
+      const urls = await ghList(folder);
+      const items = await Promise.all(urls.map(async u => {
+        try {
+          const r = await fetch(u);
+          return r.ok ? parseMd(await r.text()) : null;
+        } catch (e) { return null; }
+      }));
+      return items.filter(Boolean);
+    } catch (e) { return []; }
+  }
+
+  async function loadContent() {
+    const news = await loadFolder('content/news');
+    renderNews(news.filter(n => n.published !== false));
+
+    const products = await loadFolder('content/products');
+    renderProducts(products.filter(p => p.published !== false));
   }
 
   function renderNews(items) {
