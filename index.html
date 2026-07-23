@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ITGEOPROG</title>
+<!-- Виджет Netlify Identity — обрабатывает приглашения и вход в панель -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
   :root {
     --bg: #0a1826; --bg-panel: #0f2233; --bg-card: #12283b;
@@ -635,6 +637,19 @@
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+<script>
+  // Обработка приглашения в админ-панель:
+  // после задания пароля перенаправляем в /admin
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('init', user => {
+      if (!user) {
+        window.netlifyIdentity.on('login', () => {
+          document.location.href = '/admin/';
+        });
+      }
+    });
+  }
 </script>
 </body>
 </html>
