@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ITGEOPROG — Геофизика и электроника</title>
+<title>Услуги — ITGEOPROG</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="stylesheet" href="/assets/style.css">
 </head>
@@ -34,10 +34,10 @@
     <nav>
       <a href="/index.html" class="logo">IT<span>GEO</span>PROG</a>
       <div class="nav-links">
-        <a href="/index.html" class='active' data-i18n="nav_home">Главная</a>
+        <a href="/index.html" data-i18n="nav_home">Главная</a>
         <a href="/programs.html" data-i18n="nav_programs">Программы</a>
         <a href="/goods.html" data-i18n="nav_goods">Товары</a>
-        <a href="/services.html" data-i18n="nav_services">Услуги</a>
+        <a href="/services.html" class='active' data-i18n="nav_services">Услуги</a>
         <a href="/news.html" data-i18n="nav_news">Новости</a>
         <a href="/about.html" data-i18n="nav_about">О нас</a>
       </div>
@@ -49,44 +49,41 @@
     </nav>
   </header>
 
-  <div class="hero">
-    <div class="eyebrow" data-i18n="hero_eyebrow">Геофизика · Электроника · Разработка</div>
-    <h1 data-i18n="hero_title">Программы, приборы и <span class="accent">инженерные решения</span></h1>
-    <p class="lead" data-i18n="home_lead">Программное обеспечение для каротажных данных, товары и запчасти для геофизики и электроники, ремонт приборов и разработка электронных устройств под заказ.</p>
-  </div>
-
   <section>
-    <div class="home-cards">
-      <a href="/programs.html" class="home-card reveal">
-        <div class="hc-icon">⛏</div>
-        <h3 data-i18n="nav_programs">Программы</h3>
-        <p data-i18n="card_programs_desc">Программы для обработки геофизических данных</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/goods.html" class="home-card reveal">
-        <div class="hc-icon">🛠</div>
-        <h3 data-i18n="nav_goods">Товары</h3>
-        <p data-i18n="card_goods_desc">Оборудование и запчасти для геофизики и электроники</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/services.html" class="home-card reveal">
-        <div class="hc-icon">🔧</div>
-        <h3 data-i18n="nav_services">Услуги</h3>
-        <p data-i18n="card_services_desc">Ремонт приборов и разработка электроники</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/news.html" class="home-card reveal">
-        <div class="hc-icon">📰</div>
-        <h3 data-i18n="nav_news">Новости</h3>
-        <p data-i18n="card_news_desc">Новости и обновления</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/about.html" class="home-card reveal">
-        <div class="hc-icon">ℹ</div>
-        <h3 data-i18n="nav_about">О нас</h3>
-        <p data-i18n="card_about_desc">О компании и контакты</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
+    <div class="page-head">
+      <h1 data-i18n="sec_services">Услуги</h1>
+    </div>
+    <div class="grid-3">
+      <div class="svc-card reveal">
+        <div class="svc-icon">🔧</div>
+        <h3 data-i18n="svc_repair_title">Ремонт приборов</h3>
+        <p data-i18n="svc_repair_desc">Обслуживание и ремонт геофизических приборов и каротажного оборудования.</p>
+        <ul>
+          <li data-i18n="svc_repair_1">Диагностика неисправностей</li>
+          <li data-i18n="svc_repair_2">Ремонт скважинных приборов</li>
+          <li data-i18n="svc_repair_3">Калибровка и настройка</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">💡</div>
+        <h3 data-i18n="svc_dev_title">Разработка электроники</h3>
+        <p data-i18n="svc_dev_desc">Проектирование и создание электронных устройств для любых сфер.</p>
+        <ul>
+          <li data-i18n="svc_dev_1">Электронные схемы и платы</li>
+          <li data-i18n="svc_dev_2">Прошивки и микроконтроллеры</li>
+          <li data-i18n="svc_dev_3">Автоматизация и датчики</li>
+        </ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-icon">⚙</div>
+        <h3 data-i18n="svc_custom_title">Оборудование под заказ</h3>
+        <p data-i18n="svc_custom_desc">Специальное оборудование и устройства по вашему техническому заданию.</p>
+        <ul>
+          <li data-i18n="svc_custom_1">Индивидуальные решения</li>
+          <li data-i18n="svc_custom_2">Опытные образцы</li>
+          <li data-i18n="svc_custom_3">Мелкосерийное производство</li>
+        </ul>
+      </div>
     </div>
   </section>
 </div>

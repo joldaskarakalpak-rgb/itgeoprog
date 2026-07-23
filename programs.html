@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ITGEOPROG — Геофизика и электроника</title>
+<title>Программы — ITGEOPROG</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="stylesheet" href="/assets/style.css">
 </head>
@@ -34,8 +34,8 @@
     <nav>
       <a href="/index.html" class="logo">IT<span>GEO</span>PROG</a>
       <div class="nav-links">
-        <a href="/index.html" class='active' data-i18n="nav_home">Главная</a>
-        <a href="/programs.html" data-i18n="nav_programs">Программы</a>
+        <a href="/index.html" data-i18n="nav_home">Главная</a>
+        <a href="/programs.html" class='active' data-i18n="nav_programs">Программы</a>
         <a href="/goods.html" data-i18n="nav_goods">Товары</a>
         <a href="/services.html" data-i18n="nav_services">Услуги</a>
         <a href="/news.html" data-i18n="nav_news">Новости</a>
@@ -49,44 +49,28 @@
     </nav>
   </header>
 
-  <div class="hero">
-    <div class="eyebrow" data-i18n="hero_eyebrow">Геофизика · Электроника · Разработка</div>
-    <h1 data-i18n="hero_title">Программы, приборы и <span class="accent">инженерные решения</span></h1>
-    <p class="lead" data-i18n="home_lead">Программное обеспечение для каротажных данных, товары и запчасти для геофизики и электроники, ремонт приборов и разработка электронных устройств под заказ.</p>
-  </div>
-
   <section>
-    <div class="home-cards">
-      <a href="/programs.html" class="home-card reveal">
-        <div class="hc-icon">⛏</div>
-        <h3 data-i18n="nav_programs">Программы</h3>
-        <p data-i18n="card_programs_desc">Программы для обработки геофизических данных</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/goods.html" class="home-card reveal">
-        <div class="hc-icon">🛠</div>
-        <h3 data-i18n="nav_goods">Товары</h3>
-        <p data-i18n="card_goods_desc">Оборудование и запчасти для геофизики и электроники</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/services.html" class="home-card reveal">
-        <div class="hc-icon">🔧</div>
-        <h3 data-i18n="nav_services">Услуги</h3>
-        <p data-i18n="card_services_desc">Ремонт приборов и разработка электроники</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/news.html" class="home-card reveal">
-        <div class="hc-icon">📰</div>
-        <h3 data-i18n="nav_news">Новости</h3>
-        <p data-i18n="card_news_desc">Новости и обновления</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/about.html" class="home-card reveal">
-        <div class="hc-icon">ℹ</div>
-        <h3 data-i18n="nav_about">О нас</h3>
-        <p data-i18n="card_about_desc">О компании и контакты</p>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
+    <div class="page-head">
+      <h1 data-i18n="sec_programs">Программы</h1>
+    </div>
+    <div class="programs">
+      <div class="prog-card reveal">
+        <div class="prog-icon">⛏</div>
+        <div class="prog-info">
+          <h3>Vulkan-SFP module</h3>
+          <div class="ver mono" data-i18n="prog_vulkan_ver">версия 1.0 · Windows</div>
+          <p data-i18n="prog_vulkan_desc">Конвертер геофизических данных LAS в формат SFP. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации.</p>
+          <div class="prog-tags">
+            <span class="tag">LAS → SFP</span>
+            <span class="tag" data-i18n="tag_auto">Автообработка</span>
+            <span class="tag">GPS</span><span class="tag">FTP</span>
+          </div>
+        </div>
+        <div class="prog-action">
+          <a href="#contact" class="btn btn-primary" data-i18n="btn_get">Получить</a>
+        </div>
+      </div>
+      <div id="programs-list"></div>
     </div>
   </section>
 </div>
@@ -110,7 +94,27 @@
 </div>
 
 <script src="/assets/common.js"></script>
-
+<script>
+  (async () => {
+    const items = await loadFolder('content/programs', 'content/programs-index.json');
+    const list = items.filter(p => p.published !== false);
+    const box = document.getElementById('programs-list');
+    if (!box || !list.length) return;
+    box.innerHTML = list.map(p => `
+      <div class="prog-card reveal show">
+        <div class="prog-icon">${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">` : '💾'}</div>
+        <div class="prog-info">
+          <h3>${escapeHtml(p.title || '')}</h3>
+          <div class="ver mono">версия ${escapeHtml(p.version || '')}</div>
+          <p>${escapeHtml(p.summary || '')}</p>
+        </div>
+        <div class="prog-action">
+          ${p.setup_file ? `<a href="${p.setup_file}" class="btn btn-primary">Скачать</a>`
+            : `<a href="#contact" class="btn btn-primary">Получить</a>`}
+        </div>
+      </div>`).join('');
+  })();
+</script>
 <script>
   if (window.netlifyIdentity) {
     window.netlifyIdentity.on('init', user => {
