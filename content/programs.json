@@ -6,6 +6,13 @@
       "version": "Auto 1.0",
       "summary": "Конвертер геофизических данных LAS в формат SFP. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации.",
       "setup_file": "/images/uploads/vulkansfp_auto_setup.exe"
+    },
+    {
+      "published": true,
+      "title": "Vulkan-SFP module",
+      "version": "Full 1.0",
+      "summary": "Конвертер геофизических данных LAS в формат SFPи DAT стандарта Sigma. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации",
+      "setup_file": "/images/uploads/vulkansfp_full_setup.exe"
     }
   ]
 }
