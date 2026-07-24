@@ -1,3 +1,12 @@
 {
-  "items": []
+  "items": [
+    {
+      "in_stock": true,
+      "published": true,
+      "title": "Фотоэлектронный умножитель ФЭУ Hamamatsu R6877A  28 мм 175 С*",
+      "category": "geo",
+      "image": "/images/uploads/r6877.jpg",
+      "summary": "Для приборов радиоактивного каротажа."
+    }
+  ]
 }
