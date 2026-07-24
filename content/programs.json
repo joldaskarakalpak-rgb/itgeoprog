@@ -13,6 +13,13 @@
       "version": "Full 1.0",
       "summary": "Конвертер геофизических данных LAS в формат SFPи DAT стандарта Sigma. Автоматическая обработка папок, GPS-координаты скважин, отправка на FTP-сервер, Excel-карты данных и редактируемые правила конвертации",
       "setup_file": "/images/uploads/vulkansfp_full_setup.exe"
+    },
+    {
+      "published": true,
+      "title": "Презентация ",
+      "setup_file": "/images/uploads/vulkansfp_presentation_1-восстановлен-.pptx",
+      "summary": "Презентация",
+      "version": "1.0"
     }
   ]
 }
