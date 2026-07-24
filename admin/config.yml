@@ -1,0 +1,118 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+locale: 'ru'
+
+collections:
+  # ═══════════════════════════════════════════════════════
+  #  НОВОСТИ — все в одном файле (не требует сборки сайта)
+  # ═══════════════════════════════════════════════════════
+  - name: "news"
+    label: "Новости"
+    files:
+      - name: "news_list"
+        label: "Список новостей"
+        file: "content/news.json"
+        fields:
+          - label: "Новости"
+            name: "items"
+            widget: "list"
+            label_singular: "Новость"
+            summary: "{{fields.title}} — {{fields.date}}"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Дата", name: "date", widget: "datetime", format: "YYYY-MM-DD" }
+              - { label: "Краткое описание", name: "summary", widget: "text", required: false }
+              - { label: "Фото", name: "image", widget: "image", required: false }
+              - { label: "Текст новости", name: "body", widget: "text", required: false }
+              - { label: "Показывать на сайте", name: "published", widget: "boolean", default: true }
+
+  # ═══════════════════════════════════════════════════════
+  #  ТОВАРЫ — все в одном файле
+  # ═══════════════════════════════════════════════════════
+  - name: "products"
+    label: "Товары и запчасти"
+    files:
+      - name: "products_list"
+        label: "Список товаров"
+        file: "content/products.json"
+        fields:
+          - label: "Товары"
+            name: "items"
+            widget: "list"
+            label_singular: "Товар"
+            summary: "{{fields.title}} — {{fields.category}}"
+            fields:
+              - { label: "Название товара", name: "title", widget: "string" }
+              - label: "Категория"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "Для геофизики", value: "geo" }
+                  - { label: "Для электроники", value: "electronics" }
+                  - { label: "Под заказ", value: "order" }
+              - { label: "Фото товара", name: "image", widget: "image", required: false }
+              - label: "Дополнительные фото"
+                name: "gallery"
+                widget: "list"
+                required: false
+                field: { label: "Фото", name: "photo", widget: "image" }
+              - { label: "Краткое описание", name: "summary", widget: "text" }
+              - { label: "Подробное описание", name: "body", widget: "text", required: false }
+              - { label: "Цена", name: "price", widget: "string", required: false,
+                  hint: "Например: 500 000 сум или «по запросу»" }
+              - { label: "В наличии", name: "in_stock", widget: "boolean", default: true }
+              - { label: "Показывать на сайте", name: "published", widget: "boolean", default: true }
+
+  # ═══════════════════════════════════════════════════════
+  #  ПРОГРАММЫ — все в одном файле
+  # ═══════════════════════════════════════════════════════
+  - name: "programs"
+    label: "Программы"
+    files:
+      - name: "programs_list"
+        label: "Список программ"
+        file: "content/programs.json"
+        fields:
+          - label: "Программы"
+            name: "items"
+            widget: "list"
+            label_singular: "Программа"
+            summary: "{{fields.title}} v{{fields.version}}"
+            fields:
+              - { label: "Название программы", name: "title", widget: "string" }
+              - { label: "Версия", name: "version", widget: "string" }
+              - { label: "Иконка/скриншот", name: "image", widget: "image", required: false }
+              - { label: "Краткое описание", name: "summary", widget: "text" }
+              - { label: "Подробное описание", name: "body", widget: "text", required: false }
+              - { label: "Файл установки", name: "setup_file", widget: "file", required: false }
+              - { label: "Показывать на сайте", name: "published", widget: "boolean", default: true }
+
+  # ═══════════════════════════════════════════════════════
+  #  НАСТРОЙКИ
+  # ═══════════════════════════════════════════════════════
+  - name: "settings"
+    label: "Настройки сайта"
+    files:
+      - name: "contacts"
+        label: "Контакты"
+        file: "content/contacts.json"
+        fields:
+          - { label: "ФИО", name: "name", widget: "string" }
+          - { label: "Должность", name: "role", widget: "string" }
+          - { label: "Телефон", name: "phone", widget: "string" }
+          - { label: "Telegram", name: "telegram", widget: "string", required: false }
+          - { label: "Город/регион", name: "location", widget: "string", required: false }
+
+      - name: "update_info"
+        label: "Обновление программы"
+        file: "version.json"
+        fields:
+          - { label: "Версия программы", name: "version", widget: "string",
+              hint: "Эту версию проверяет программа Vulkan-SFP" }
+          - { label: "Ссылка на установщик", name: "url", widget: "string" }
+          - { label: "Что нового", name: "notes", widget: "text" }

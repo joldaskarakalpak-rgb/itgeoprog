@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для электроники — ITGEOPROG</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body data-category="electronics">
+
+<div class="log-strip" aria-hidden="true">
+  <div class="depth-label" data-i18n="side_label">ГК · каротаж</div>
+  <svg viewBox="0 0 40 800" preserveAspectRatio="none">
+    <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0a830" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#4a7fa8" stop-opacity="0.5"/>
+    </linearGradient></defs>
+    <g stroke="#1e3a52" stroke-width="1">
+      <line x1="0" y1="100" x2="40" y2="100"/><line x1="0" y1="200" x2="40" y2="200"/>
+      <line x1="0" y1="300" x2="40" y2="300"/><line x1="0" y1="400" x2="40" y2="400"/>
+      <line x1="0" y1="500" x2="40" y2="500"/><line x1="0" y1="600" x2="40" y2="600"/>
+      <line x1="0" y1="700" x2="40" y2="700"/>
+    </g>
+    <path d="M20,0 L18,40 L26,70 L14,110 L22,150 L30,180 L16,220 L24,260
+             L12,300 L28,340 L20,380 L32,410 L15,450 L25,490 L18,530
+             L30,570 L14,610 L26,650 L20,690 L24,730 L16,770 L22,800"
+          fill="none" stroke="url(#lg)" stroke-width="2"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <header>
+    <nav>
+      <a href="/index.html" class="logo">IT<span>GEO</span>PROG</a>
+      <div class="nav-links">
+        <a href="/index.html" data-i18n="nav_home">Главная</a>
+        <a href="/programs.html" data-i18n="nav_programs">Программы</a>
+        <a href="/goods.html" class='active' data-i18n="nav_goods">Товары</a>
+        <a href="/services.html" data-i18n="nav_services">Услуги</a>
+        <a href="/news.html" data-i18n="nav_news">Новости</a>
+        <a href="/about.html" data-i18n="nav_about">О нас</a>
+      </div>
+      <div class="lang-switch">
+        <button data-lang="ru">RU</button>
+        <button data-lang="uz">UZ</button>
+        <button data-lang="kaa">QQ</button>
+      </div>
+    </nav>
+  </header>
+
+  <section>
+    <div class="page-head">
+      <a href="/goods.html" class="back-link" data-i18n="back_goods">← Товары и запчасти</a>
+      <h1 id="cat-title">Категория</h1>
+    </div>
+    <div id="products-grid" class="prod-grid"></div>
+    <div id="cat-empty" class="news-empty" style="display:none" data-i18n="cat_empty">
+      В этой категории пока нет товаров.
+    </div>
+  </section>
+</div>
+
+<div class="contact-band" id="contact">
+  <div class="contact-inner">
+    <h2 data-i18n="contact_title">Нужна программа, деталь или ремонт?</h2>
+    <p data-i18n="contact_desc">Свяжитесь с нами — обсудим вашу задачу и подберём решение.</p>
+    <div class="contact-btns">
+      <a href="tel:+998907003038" class="btn btn-primary">✆ +998 90 700 30 38</a>
+      <a href="https://t.me/+998907003038" class="btn btn-ghost" data-i18n="contact_tg">✈ Написать в Telegram</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <div class="logo" style="font-size:16px">IT<span style="color:var(--amber)">GEO</span>PROG</div>
+    <div class="mono" data-i18n="footer_text">© 2026 · Ерназаров Ж.К. · Геофизика и электроника</div>
+  </footer>
+</div>
+
+<!-- Просмотр фото на весь экран -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
+  <button class="lb-close" aria-label="Закрыть">&times;</button>
+  <button class="lb-nav lb-prev" aria-label="Предыдущее">&lsaquo;</button>
+  <img id="lb-img" src="" alt="">
+  <button class="lb-nav lb-next" aria-label="Следующее">&rsaquo;</button>
+  <div class="lb-counter" id="lb-counter"></div>
+</div>
+
+<script src="/assets/common.js"></script>
+<script>
+  (async () => {
+    const cat = document.body.dataset.category;
+    const titles = { geo: 'goods_geo_title', electronics: 'goods_el_title', order: 'goods_order_title' };
+    const items = await loadJson('content/products.json');
+    const list = items.filter(p => p.published !== false && p.category === cat);
+
+    // Заголовок страницы из переводов
+    const h = document.getElementById('cat-title');
+    if (h && titles[cat]) h.setAttribute('data-i18n', titles[cat]);
+    const lang = (localStorage.getItem('itg_lang') || 'ru');
+    if (h && titles[cat] && I18N[lang]) h.textContent = I18N[lang][titles[cat]] || '';
+
+    const grid = document.getElementById('products-grid');
+    const empty = document.getElementById('cat-empty');
+    if (!list.length) { if (empty) empty.style.display = 'block'; return; }
+
+    grid.innerHTML = list.map((p, i) => `
+      <a href="/product.html?n=${i}&cat=${cat}" class="prod-card reveal show">
+        ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
+        <div class="prod-body">
+          <h4>${escapeHtml(p.title || '')}</h4>
+          <p>${escapeHtml(p.summary || '')}</p>
+          ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
+          <span class="prod-stock${p.in_stock === false ? ' out' : ''}">
+            ${p.in_stock === false ? 'нет в наличии' : 'в наличии'}
+          </span>
+        </div>
+      </a>`).join('');
+  })();
+</script>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on('init', user => {
+      if (!user) {
+        window.netlifyIdentity.on('login', () => { document.location.href = '/admin/'; });
+      }
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Без команды сборки — деплой = простое копирование файлов.
+# Это минимальный расход кредитов Netlify.
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
+# Контент не кэшируем — изменения видны сразу
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
