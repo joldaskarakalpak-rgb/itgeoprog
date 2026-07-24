@@ -1,8 +1,0 @@
----
-name: Ерназаров Жолдасбай Курбанбаевич
-role: разработчик · геофизик · инженер
-phone: +998 90 700 30 38
-telegram: https://t.me/+998907003038
-email: joldasbay22@gmail.com
-location: Узбекистан
----
