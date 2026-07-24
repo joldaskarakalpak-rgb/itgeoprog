@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Товары и запчасти — ITGEOPROG</title>
+<title>Под заказ — ITGEOPROG</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="stylesheet" href="/assets/style.css">
 </head>
-<body>
+<body data-category="order">
 
 <div class="log-strip" aria-hidden="true">
   <div class="depth-label" data-i18n="side_label">ГК · каротаж</div>
@@ -51,30 +51,12 @@
 
   <section>
     <div class="page-head">
-      <h1 data-i18n="sec_goods">Товары и запчасти</h1>
+      <a href="/goods.html" class="back-link" data-i18n="back_goods">← Товары и запчасти</a>
+      <h1 id="cat-title">Категория</h1>
     </div>
-    <div class="grid-3">
-      <a href="/goods-geo.html" class="svc-card cat-card reveal">
-        <div class="svc-icon">🛠</div>
-        <h3 data-i18n="goods_geo_title">Для геофизики</h3>
-        <p data-i18n="goods_geo_desc">Оборудование, запчасти и комплектующие для каротажных работ.</p>
-        <span class="cat-count" data-cat="geo"></span>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/goods-electronics.html" class="svc-card cat-card reveal">
-        <div class="svc-icon">🔌</div>
-        <h3 data-i18n="goods_el_title">Для электроники</h3>
-        <p data-i18n="goods_el_desc">Электронные компоненты и материалы для сборки и ремонта.</p>
-        <span class="cat-count" data-cat="electronics"></span>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
-      <a href="/goods-order.html" class="svc-card cat-card reveal">
-        <div class="svc-icon">📦</div>
-        <h3 data-i18n="goods_order_title">Под заказ</h3>
-        <p data-i18n="goods_order_desc">Поиск и поставка нужных деталей и оборудования по запросу.</p>
-        <span class="cat-count" data-cat="order"></span>
-        <span class="hc-link" data-i18n="card_open">Открыть →</span>
-      </a>
+    <div id="products-grid" class="prod-grid"></div>
+    <div id="cat-empty" class="news-empty" style="display:none" data-i18n="cat_empty">
+      В этой категории пока нет товаров.
     </div>
   </section>
 </div>
@@ -100,12 +82,33 @@
 <script src="/assets/common.js"></script>
 <script>
   (async () => {
+    const cat = document.body.dataset.category;
+    const titles = { geo: 'goods_geo_title', electronics: 'goods_el_title', order: 'goods_order_title' };
     const items = await loadFolder('content/products', 'content/products-index.json');
-    const list = items.filter(p => p.published !== false);
-    document.querySelectorAll('.cat-count').forEach(el => {
-      const n = list.filter(p => p.category === el.dataset.cat).length;
-      el.textContent = n ? `${n} поз.` : '';
-    });
+    const list = items.filter(p => p.published !== false && p.category === cat);
+
+    // Заголовок страницы из переводов
+    const h = document.getElementById('cat-title');
+    if (h && titles[cat]) h.setAttribute('data-i18n', titles[cat]);
+    const lang = (localStorage.getItem('itg_lang') || 'ru');
+    if (h && titles[cat] && I18N[lang]) h.textContent = I18N[lang][titles[cat]] || '';
+
+    const grid = document.getElementById('products-grid');
+    const empty = document.getElementById('cat-empty');
+    if (!list.length) { if (empty) empty.style.display = 'block'; return; }
+
+    grid.innerHTML = list.map((p, i) => `
+      <a href="/product.html?id=${encodeURIComponent(p.__file || i)}&cat=${cat}" class="prod-card reveal show">
+        ${p.image ? `<img src="${p.image}" alt="">` : '<div class="prod-noimg">📦</div>'}
+        <div class="prod-body">
+          <h4>${escapeHtml(p.title || '')}</h4>
+          <p>${escapeHtml(p.summary || '')}</p>
+          ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
+          <span class="prod-stock${p.in_stock === false ? ' out' : ''}">
+            ${p.in_stock === false ? 'нет в наличии' : 'в наличии'}
+          </span>
+        </div>
+      </a>`).join('');
   })();
 </script>
 <script>

@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
- * Автоматически создаёт списки файлов для сайта.
- * Netlify запускает этот скрипт при каждой сборке,
- * поэтому новые новости и товары появляются сами.
+ * Создаёт списки файлов для сайта.
+ * Netlify запускает при каждой сборке — новые записи появляются сами.
  */
 const fs = require('fs');
 const path = require('path');
@@ -14,9 +13,9 @@ function buildIndex(folder, outFile) {
     names = fs.readdirSync(dir)
       .filter(f => f.endsWith('.md'))
       .sort()
-      .reverse();               // новые сверху
+      .reverse();
   } catch (e) {
-    names = [];                 // папки может не быть — это нормально
+    names = [];
   }
   const out = path.join(__dirname, outFile);
   fs.writeFileSync(out, JSON.stringify(names, null, 2), 'utf8');
@@ -26,5 +25,4 @@ function buildIndex(folder, outFile) {
 buildIndex('content/news', 'content/news-index.json');
 buildIndex('content/products', 'content/products-index.json');
 buildIndex('content/programs', 'content/programs-index.json');
-
 console.log('Индексы обновлены.');

@@ -1,5 +1,7 @@
 const I18N = {
     ru: {
+      back_goods: "← Товары и запчасти",
+      cat_empty: "В этой категории пока нет товаров.",
       nav_home: "Главная",
       home_lead: "Программное обеспечение для каротажных данных, товары и запчасти для геофизики и электроники, ремонт приборов и разработка электронных устройств под заказ.",
       card_programs_desc: "Программы для обработки геофизических данных",
@@ -61,6 +63,8 @@ const I18N = {
       footer_text: "© 2026 · Ерназаров Ж.К. · Геофизика и электроника"
     },
     uz: {
+      back_goods: "← Mahsulotlar va ehtiyot qismlar",
+      cat_empty: "Bu turkumda hozircha mahsulotlar yo'q.",
       nav_home: "Bosh sahifa",
       home_lead: "Karotaj ma'lumotlari uchun dasturiy ta'minot, geofizika va elektronika uchun mahsulotlar va ehtiyot qismlar, asboblarni ta'mirlash hamda buyurtma asosida elektron qurilmalar ishlab chiqish.",
       card_programs_desc: "Geofizik ma'lumotlarni qayta ishlash dasturlari",
@@ -122,6 +126,8 @@ const I18N = {
       footer_text: "© 2026 · Ernazarov J.Q. · Geofizika va elektronika"
     },
     kaa: {
+      back_goods: "← Ónimler hám zápas bólekler",
+      cat_empty: "Bul turkimde házirshe ónimler joq.",
       nav_home: "Bas bet",
       home_lead: "Karotaj mag'lıwmatları ushın bag'darlamalıq támiynat, geofizika hám elektronika ushın ónimler hám zápas bólekler, ásbaplardı jóndew hám buyırtpa boyınsha elektron qurılmalar islep shıg'ıw.",
       card_programs_desc: "Geofizikalıq mag'lıwmatlardı qayta islew bag'darlamaları",
@@ -205,17 +211,29 @@ function setLang(lang) {
 function parseMd(text) {
   const m = text.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/);
   if (!m) return { body: text };
-  const data = { body: (m[2] || '').trim() };
+  const data = { body: (m[2] || '').trim(), gallery: [] };
+  let lastKey = null;
   m[1].split('\n').forEach(line => {
+    // Элемент списка: "  - значение"
+    const li = line.match(/^\s*-\s+(.+)$/);
+    if (li && lastKey) {
+      let v = li[1].trim().replace(/^["']|["']$/g, '');
+      if (!Array.isArray(data[lastKey])) data[lastKey] = [];
+      data[lastKey].push(v);
+      return;
+    }
     const i = line.indexOf(':');
     if (i < 0) return;
     const key = line.slice(0, i).trim();
     let val = line.slice(i + 1).trim();
+    lastKey = key;
+    if (val === '') { data[key] = []; return; }   // начало списка
     val = val.replace(/^["']|["']$/g, '');
     if (val === 'true') val = true;
     else if (val === 'false') val = false;
     data[key] = val;
   });
+  if (!Array.isArray(data.gallery)) data.gallery = [];
   return data;
 }
 
@@ -229,7 +247,10 @@ async function loadFolder(folder, indexFile) {
     const items = await Promise.all(names.map(async name => {
       try {
         const res = await fetch(`/${folder}/${name}?v=` + Date.now());
-        return res.ok ? parseMd(await res.text()) : null;
+        if (!res.ok) return null;
+        const data = parseMd(await res.text());
+        data.__file = name.replace(/\.md$/, '');   // id для ссылок
+        return data;
       } catch (e) { return null; }
     }));
     return items.filter(Boolean);
