@@ -56,15 +56,6 @@
     </div>
     <div id="prod-detail" class="prod-detail"></div>
   </section>
-
-  <!-- Просмотр фото на весь экран -->
-  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
-    <button class="lb-close" aria-label="Закрыть">×</button>
-    <button class="lb-nav lb-prev" aria-label="Предыдущее">‹</button>
-    <img id="lb-img" src="" alt="">
-    <button class="lb-nav lb-next" aria-label="Следующее">›</button>
-    <div class="lb-counter" id="lb-counter"></div>
-  </div>
 </div>
 
 <div class="contact-band" id="contact">
@@ -83,6 +74,15 @@
     <div class="logo" style="font-size:16px">IT<span style="color:var(--amber)">GEO</span>PROG</div>
     <div class="mono" data-i18n="footer_text">© 2026 · Ерназаров Ж.К. · Геофизика и электроника</div>
   </footer>
+</div>
+
+<!-- Просмотр фото на весь экран -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true">
+  <button class="lb-close" aria-label="Закрыть">&times;</button>
+  <button class="lb-nav lb-prev" aria-label="Предыдущее">&lsaquo;</button>
+  <img id="lb-img" src="" alt="">
+  <button class="lb-nav lb-next" aria-label="Следующее">&rsaquo;</button>
+  <div class="lb-counter" id="lb-counter"></div>
 </div>
 
 <script src="/assets/common.js"></script>
@@ -158,21 +158,25 @@
     }
 
     const main = document.getElementById('pd-main');
-    if (main) main.addEventListener('click', () => openLb(Number(main.dataset.idx || 0)));
+    if (main) main.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLb(Number(main.dataset.idx || 0));
+    });
 
     document.querySelectorAll('.pd-thumb').forEach(t => {
-      t.addEventListener('click', () => {
+      t.addEventListener('click', (e) => {
+        e.stopPropagation();
         const i = Number(t.dataset.idx);
         if (main) { main.src = photos[i]; main.dataset.idx = i; }
         document.querySelectorAll('.pd-thumb').forEach(x => x.classList.remove('active'));
         t.classList.add('active');
       });
-      t.addEventListener('dblclick', () => openLb(Number(t.dataset.idx)));
     });
 
     lb.querySelector('.lb-close').addEventListener('click', closeLb);
     lb.querySelector('.lb-prev').addEventListener('click', e => { e.stopPropagation(); move(-1); });
     lb.querySelector('.lb-next').addEventListener('click', e => { e.stopPropagation(); move(1); });
+    lbImg.addEventListener('click', e => e.stopPropagation());
     lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
     document.addEventListener('keydown', e => {
       if (!lb.classList.contains('open')) return;
@@ -184,12 +188,11 @@
 
   // Простой Markdown → HTML
   function mdToHtml(md) {
+    const NL = String.fromCharCode(10);
     return String(md)
-      .split(/
-
-+/)
-      .map(par => '<p>' + escapeHtml(par.trim()).replace(/
-/g, '<br>') + '</p>')
+      .split(NL + NL)
+      .filter(p => p.trim())
+      .map(par => '<p>' + escapeHtml(par.trim()).split(NL).join('<br>') + '</p>')
       .join('');
   }
 </script>
