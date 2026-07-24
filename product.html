@@ -88,6 +88,7 @@
 <script src="/assets/common.js"></script>
 <script>
   (async () => {
+   try {
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     const cat = params.get('cat') || '';
@@ -98,7 +99,15 @@
     if (back) back.href = backMap[cat] || '/goods.html';
 
     const items = await loadFolder('content/products', 'content/products-index.json');
-    const prod = items.find(p => p.__file === id) || items[Number(id)] || null;
+    // Ищем товар: точное совпадение, затем декодированное (кириллица в URL)
+    let prod = items.find(p => p.__file === id);
+    if (!prod && id) {
+      const dec = decodeURIComponent(id);
+      prod = items.find(p => p.__file === dec)
+          || items.find(p => decodeURIComponent(p.__file) === dec)
+          || items.find(p => p.__file.toLowerCase() === dec.toLowerCase());
+    }
+    if (!prod && id && !isNaN(Number(id))) prod = items[Number(id)];
     const box = document.getElementById('prod-detail');
     if (!prod || !box) { if (box) box.innerHTML = '<p class="news-empty">Товар не найден.</p>'; return; }
 
@@ -107,13 +116,15 @@
 
     // Собираем все фото: основное + галерея
     const photos = [];
-    if (prod.image) photos.push(prod.image);
-    if (Array.isArray(prod.gallery)) photos.push(...prod.gallery.filter(Boolean));
+    if (prod.image) photos.push(fixPath(prod.image));
+    if (Array.isArray(prod.gallery)) {
+      prod.gallery.filter(Boolean).forEach(g => photos.push(fixPath(g)));
+    }
 
     box.innerHTML = `
       <div class="pd-gallery">
         ${photos.length ? `
-          <img class="pd-main" id="pd-main" src="${photos[0]}" alt="" data-idx="0">
+          <img class="pd-main" id="pd-main" src="${photos[0]}" alt="" data-idx="0" title="Нажмите для увеличения">
           ${photos.length > 1 ? `<div class="pd-thumbs">
             ${photos.map((src, i) => `<img class="pd-thumb${i === 0 ? ' active' : ''}" src="${src}" data-idx="${i}" alt="">`).join('')}
           </div>` : ''}
@@ -184,6 +195,11 @@
       if (e.key === 'ArrowLeft') move(-1);
       if (e.key === 'ArrowRight') move(1);
     });
+   } catch (err) {
+     console.error('Ошибка страницы товара:', err);
+     const box = document.getElementById('prod-detail');
+     if (box) box.innerHTML = '<p class="news-empty">Не удалось загрузить товар. Обновите страницу.</p>';
+   }
   })();
 
   // Простой Markdown → HTML

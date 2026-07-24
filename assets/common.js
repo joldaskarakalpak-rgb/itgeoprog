@@ -246,7 +246,7 @@ async function loadFolder(folder, indexFile) {
     if (!Array.isArray(names)) return [];
     const items = await Promise.all(names.map(async name => {
       try {
-        const res = await fetch(`/${folder}/${name}?v=` + Date.now());
+        const res = await fetch(`/${folder}/${encodeURIComponent(name)}?v=` + Date.now());
         if (!res.ok) return null;
         const data = parseMd(await res.text());
         data.__file = name.replace(/\.md$/, '');   // id для ссылок
@@ -255,6 +255,18 @@ async function loadFolder(folder, indexFile) {
     }));
     return items.filter(Boolean);
   } catch (e) { return []; }
+}
+
+
+// Приводит путь к фото в рабочий вид:
+// "images/uploads/a.jpg" -> "/images/uploads/a.jpg"
+function fixPath(src) {
+  if (!src) return '';
+  src = String(src).trim().replace(/^["']|["']$/g, '');
+  if (!src) return '';
+  if (src.startsWith('http://') || src.startsWith('https://')) return src;
+  if (src.startsWith('/')) return src;
+  return '/' + src.replace(/^\.?\//, '');
 }
 
 function formatDate(d) {

@@ -108,7 +108,7 @@
 
     grid.innerHTML = list.map((p, i) => `
       <a href="/product.html?id=${encodeURIComponent(p.__file || i)}&cat=${cat}" class="prod-card reveal show">
-        ${p.image ? `<img src="${p.image}" alt="">` : '<div class="prod-noimg">📦</div>'}
+        ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
         <div class="prod-body">
           <h4>${escapeHtml(p.title || '')}</h4>
           <p>${escapeHtml(p.summary || '')}</p>

@@ -96,7 +96,7 @@
     list.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     box.innerHTML = list.map(n => `
       <article class="news-card reveal show">
-        ${n.image ? `<img src="${n.image}" alt="">` : ''}
+        ${n.image ? `<img src="${fixPath(n.image)}" alt="" loading="lazy">` : ''}
         <div class="news-body">
           <div class="news-date">${formatDate(n.date)}</div>
           <h3>${escapeHtml(n.title || '')}</h3>

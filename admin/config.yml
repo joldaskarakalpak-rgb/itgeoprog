@@ -18,7 +18,7 @@ collections:
     label_singular: "Новость"
     folder: "content/news"
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    slug: "{{year}}-{{month}}-{{day}}-{{hour}}{{minute}}"
     summary: "{{title}} — {{date}}"
     sortable_fields: ['date', 'title']
     fields:
@@ -39,7 +39,7 @@ collections:
     label_singular: "Товар"
     folder: "content/products"
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}} — {{category}}"
     sortable_fields: ['title', 'category']
     fields:
@@ -71,7 +71,7 @@ collections:
     label_singular: "Программа"
     folder: "content/programs"
     create: true
-    slug: "{{slug}}"
+    slug: "{{year}}{{month}}{{day}}-{{hour}}{{minute}}{{second}}"
     summary: "{{title}} v{{version}}"
     fields:
       - { label: "Название программы", name: "title", widget: "string" }
