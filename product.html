@@ -90,7 +90,7 @@
   (async () => {
    try {
     const params = new URLSearchParams(location.search);
-    const id = params.get('id');
+    const n = params.get('n');
     const cat = params.get('cat') || '';
 
     // Ссылка назад — в свою категорию
@@ -99,15 +99,9 @@
     if (back) back.href = backMap[cat] || '/goods.html';
 
     const items = await loadFolder('content/products', 'content/products-index.json');
-    // Ищем товар: точное совпадение, затем декодированное (кириллица в URL)
-    let prod = items.find(p => p.__file === id);
-    if (!prod && id) {
-      const dec = decodeURIComponent(id);
-      prod = items.find(p => p.__file === dec)
-          || items.find(p => decodeURIComponent(p.__file) === dec)
-          || items.find(p => p.__file.toLowerCase() === dec.toLowerCase());
-    }
-    if (!prod && id && !isNaN(Number(id))) prod = items[Number(id)];
+    // Берём товары нужной категории и находим по порядковому номеру
+    const inCat = items.filter(p => p.published !== false && (!cat || p.category === cat));
+    const prod = inCat[Number(n)] || null;
     const box = document.getElementById('prod-detail');
     if (!prod || !box) { if (box) box.innerHTML = '<p class="news-empty">Товар не найден.</p>'; return; }
 

@@ -107,7 +107,7 @@
     if (!list.length) { if (empty) empty.style.display = 'block'; return; }
 
     grid.innerHTML = list.map((p, i) => `
-      <a href="/product.html?id=${encodeURIComponent(p.__file || i)}&cat=${cat}" class="prod-card reveal show">
+      <a href="/product.html?n=${i}&cat=${cat}" class="prod-card reveal show">
         ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
         <div class="prod-body">
           <h4>${escapeHtml(p.title || '')}</h4>
