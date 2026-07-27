@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Программы — ITGEOPROG</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/assets/logo-192.png">
 <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
@@ -32,7 +34,7 @@
 <div class="wrap">
   <header>
     <nav>
-      <a href="/index.html" class="logo">IT<span>GEO</span>PROG</a>
+      <a href="/index.html" class="logo"><img src="/assets/logo.png" class="logo-img" alt="">IT<span>GEO</span>PROG</a>
       <div class="nav-links">
         <a href="/index.html" data-i18n="nav_home">Главная</a>
         <a href="/programs.html" class='active' data-i18n="nav_programs">Программы</a>
@@ -71,6 +73,19 @@
         </div>
       </div>
       <div id="programs-list"></div>
+    </div>
+
+    <!-- Презентация -->
+    <div class="pres-block">
+      <h2 class="pres-title" data-i18n="pres_title">Презентация программы</h2>
+      <p class="pres-desc" data-i18n="pres_desc">Как Vulkan-SFP защищает подлинность каротажных записей.</p>
+      <div class="pres-viewer">
+        <iframe src="/downloads/VulkanSFP_Presentation.pdf" title="Презентация"></iframe>
+      </div>
+      <div class="pres-actions">
+        <a href="/downloads/VulkanSFP_Presentation.pdf" target="_blank" class="btn btn-primary" data-i18n="pres_view">Открыть на весь экран</a>
+        <a href="/downloads/VulkanSFP_Presentation.pptx" download class="btn btn-ghost" data-i18n="pres_download">Скачать (PowerPoint)</a>
+      </div>
     </div>
   </section>
 </div>

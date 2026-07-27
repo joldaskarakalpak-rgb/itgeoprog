@@ -1,5 +1,9 @@
 const I18N = {
     ru: {
+      pres_title: "Презентация программы",
+      pres_desc: "Как Vulkan-SFP защищает подлинность каротажных записей.",
+      pres_view: "Открыть на весь экран",
+      pres_download: "Скачать (PowerPoint)",
       back_goods: "← Товары и запчасти",
       cat_empty: "В этой категории пока нет товаров.",
       nav_home: "Главная",
@@ -63,6 +67,10 @@ const I18N = {
       footer_text: "© 2026 · Ерназаров Ж.К. · Геофизика и электроника"
     },
     uz: {
+      pres_title: "Dastur taqdimoti",
+      pres_desc: "Vulkan-SFP karotaj yozuvlari haqiqiyligini qanday himoya qiladi.",
+      pres_view: "To'liq ekranda ochish",
+      pres_download: "Yuklab olish (PowerPoint)",
       back_goods: "← Mahsulotlar va ehtiyot qismlar",
       cat_empty: "Bu turkumda hozircha mahsulotlar yo'q.",
       nav_home: "Bosh sahifa",
@@ -126,6 +134,10 @@ const I18N = {
       footer_text: "© 2026 · Ernazarov J.Q. · Geofizika va elektronika"
     },
     kaa: {
+      pres_title: "Bag'darlama taqdimatı",
+      pres_desc: "Vulkan-SFP karotaj jazıwları haqıyqıylıg'ın qalay qorg'aydı.",
+      pres_view: "Tolıq ekranda ashıw",
+      pres_download: "Júklep alıw (PowerPoint)",
       back_goods: "← Ónimler hám zápas bólekler",
       cat_empty: "Bul turkimde házirshe ónimler joq.",
       nav_home: "Bas bet",
