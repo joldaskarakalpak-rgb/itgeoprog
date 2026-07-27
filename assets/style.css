@@ -254,3 +254,7 @@ a.prod-card { text-decoration: none; display: block; }
   .lb-nav { width: 44px; height: 60px; font-size: 32px; }
   .lb-prev { left: 6px; } .lb-next { right: 6px; }
 }
+
+/* Логотип-значок в шапке */
+.logo { display: inline-flex; align-items: center; gap: 10px; }
+.logo-img { width: 32px; height: 32px; border-radius: 7px; display: block; }
