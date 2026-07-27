@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Под заказ — ITGEOPROG</title>
+<title>Поиск — ITGEOPROG</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/assets/logo-192.png">
 <link rel="stylesheet" href="/assets/style.css">
 </head>
-<body data-category="order">
+<body>
 
 <div class="log-strip" aria-hidden="true">
   <div class="depth-label" data-i18n="side_label">ГК · каротаж</div>
@@ -60,12 +60,14 @@
 
   <section>
     <div class="page-head">
-      <a href="/goods.html" class="back-link" data-i18n="back_goods">← Товары и запчасти</a>
-      <h1 id="cat-title">Категория</h1>
+      <h1 data-i18n="search_title">Поиск по сайту</h1>
     </div>
-    <div id="products-grid" class="prod-grid"></div>
-    <div id="cat-empty" class="news-empty" style="display:none" data-i18n="cat_empty">
-      В этой категории пока нет товаров.
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Что ищете?" autofocus>
+    </div>
+    <div id="search-results" class="search-results"></div>
+    <div id="search-hint" class="news-empty" data-i18n="search_hint">
+      Введите запрос — поиск по товарам, новостям и услугам.
     </div>
   </section>
 </div>
@@ -100,53 +102,56 @@
 <script src="/assets/common.js"></script>
 <script>
   (async () => {
-    const cat = document.body.dataset.category;
-    const titles = { geo: 'goods_geo_title', electronics: 'goods_el_title', order: 'goods_order_title' };
-    const items = await loadJson('content/products.json');
-    const list = items.filter(p => p.published !== false && p.category === cat);
+    // Собираем данные для поиска
+    const products = await loadJson('content/products.json');
+    const news = await loadJson('content/news.json');
 
-    // Заголовок страницы из переводов
-    const h = document.getElementById('cat-title');
-    if (h && titles[cat]) h.setAttribute('data-i18n', titles[cat]);
     const lang = (localStorage.getItem('itg_lang') || 'ru');
-    if (h && titles[cat] && I18N[lang]) h.textContent = I18N[lang][titles[cat]] || '';
+    const t = (k) => (I18N[lang] && I18N[lang][k]) || k;
 
-    const grid = document.getElementById('products-grid');
-    const empty = document.getElementById('cat-empty');
-    if (!list.length) { if (empty) empty.style.display = 'block'; return; }
+    // Услуги — из переводов (статические)
+    const services = [
+      { title: t('svc_repair_title'), summary: t('svc_repair_desc'), url: '/services.html', type: 'Услуга' },
+      { title: t('svc_dev_title'), summary: t('svc_dev_desc'), url: '/services.html', type: 'Услуга' },
+      { title: t('svc_custom_title'), summary: t('svc_custom_desc'), url: '/services.html', type: 'Услуга' },
+    ];
 
-    grid.innerHTML = list.map((p, i) => {
-      const inStock = p.in_stock !== false;
-      const cartBtn = (cat === 'electronics' && inStock)
-        ? `<button class="add-cart" data-title="${escapeHtml(p.title || '')}" data-price="${escapeHtml(p.price || '')}">В корзину</button>`
-        : '';
-      return `
-      <div class="prod-card reveal show">
-        <a href="/product.html?n=${i}&cat=${cat}" class="prod-link">
-          ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
-          <div class="prod-body">
-            <h4>${escapeHtml(p.title || '')}</h4>
-            <p>${escapeHtml(p.summary || '')}</p>
-            ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
-            <span class="prod-stock${inStock ? '' : ' out'}">
-              ${inStock ? 'в наличии' : 'нет в наличии'}
-            </span>
-          </div>
-        </a>
-        ${cartBtn}
-      </div>`;
-    }).join('');
-
-    // Кнопки «в корзину»
-    grid.querySelectorAll('.add-cart').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        Cart.add(btn.dataset.title, btn.dataset.price);
-        btn.textContent = '✓ Добавлено';
-        btn.classList.add('added');
-        setTimeout(() => { btn.textContent = 'В корзину'; btn.classList.remove('added'); }, 1500);
+    const catUrl = { geo: '/goods-geo.html', electronics: '/goods-electronics.html', order: '/goods-order.html' };
+    const index = [];
+    products.filter(p => p.published !== false).forEach((p, i) => {
+      index.push({
+        title: p.title || '', summary: p.summary || '',
+        url: catUrl[p.category] || '/goods.html', type: 'Товар',
       });
     });
+    news.filter(n => n.published !== false).forEach(n => {
+      index.push({ title: n.title || '', summary: n.summary || '', url: '/news.html', type: 'Новость' });
+    });
+    services.forEach(s => index.push(s));
+
+    const input = document.getElementById('search-input');
+    const results = document.getElementById('search-results');
+    const hint = document.getElementById('search-hint');
+
+    function search(q) {
+      q = q.trim().toLowerCase();
+      if (!q) { results.innerHTML = ''; hint.style.display = 'block'; return; }
+      hint.style.display = 'none';
+      const found = index.filter(it =>
+        (it.title + ' ' + it.summary).toLowerCase().includes(q));
+      if (!found.length) {
+        results.innerHTML = '<div class="news-empty">' + t('search_none') + '</div>';
+        return;
+      }
+      results.innerHTML = found.map(it => `
+        <a href="${it.url}" class="search-item">
+          <span class="search-type">${it.type}</span>
+          <div class="search-item-title">${escapeHtml(it.title)}</div>
+          <div class="search-item-sum">${escapeHtml(it.summary)}</div>
+        </a>`).join('');
+    }
+
+    input.addEventListener('input', () => search(input.value));
   })();
 </script>
 <script>

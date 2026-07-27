@@ -1,5 +1,19 @@
 const I18N = {
     ru: {
+      nav_search: "Поиск",
+      search_title: "Поиск по сайту", search_hint: "Введите запрос — поиск по товарам, новостям и услугам.",
+      search_none: "Ничего не найдено.",
+      cart_title: "Корзина", cart_empty: "Корзина пуста.", back_shop: "← Продолжить покупки",
+      order_title: "Оформление заказа", order_name: "Ваше имя", order_phone: "Телефон",
+      order_address: "Адрес доставки", order_comment: "Комментарий (необязательно)",
+      order_send: "Оформить заказ через Telegram",
+      order_note: "После нажатия откроется Telegram с готовым заказом — просто отправьте сообщение.",
+      cap_title: "Что мы можем",
+      cap_pcb_t: "Печатные платы", cap_pcb_d: "Проектируем и изготавливаем печатные платы любой сложности — от эскиза до готового изделия.",
+      cap_gerber_t: "Чертежи и Gerber", cap_gerber_d: "Создаём эскизы, чертежи и Gerber-файлы для производства печатных плат любого назначения.",
+      cap_device_t: "Проекты устройств", cap_device_d: "Разрабатываем готовые полные проекты электронных устройств для запуска в производство.",
+      cap_soft_t: "Программы и приложения", cap_soft_d: "Пишем специальные программы и приложения для устройств и задач любого назначения.",
+      cap_banner: "Готовы принимать государственные и частные заказы",
       pres_title: "Презентация программы",
       pres_desc: "Как Vulkan-SFP защищает подлинность каротажных записей.",
       pres_view: "Открыть на весь экран",
@@ -67,6 +81,20 @@ const I18N = {
       footer_text: "© 2026 · Ерназаров Ж.К. · Геофизика и электроника"
     },
     uz: {
+      nav_search: "Qidiruv",
+      search_title: "Sayt bo'ylab qidiruv", search_hint: "So'rovni kiriting — mahsulotlar, yangiliklar va xizmatlar bo'yicha.",
+      search_none: "Hech narsa topilmadi.",
+      cart_title: "Savat", cart_empty: "Savat bo'sh.", back_shop: "← Xaridni davom ettirish",
+      order_title: "Buyurtmani rasmiylashtirish", order_name: "Ismingiz", order_phone: "Telefon",
+      order_address: "Yetkazib berish manzili", order_comment: "Izoh (ixtiyoriy)",
+      order_send: "Telegram orqali buyurtma berish",
+      order_note: "Bosgandan so'ng tayyor buyurtma bilan Telegram ochiladi — shunchaki xabarni yuboring.",
+      cap_title: "Nima qila olamiz",
+      cap_pcb_t: "Bosma platalar", cap_pcb_d: "Har qanday murakkablikdagi bosma platalarni loyihalaymiz va ishlab chiqamiz — eskizdan tayyor mahsulotgacha.",
+      cap_gerber_t: "Chizmalar va Gerber", cap_gerber_d: "Har qanday maqsaddagi bosma platalar uchun eskiz, chizma va Gerber-fayllar yaratamiz.",
+      cap_device_t: "Qurilma loyihalari", cap_device_d: "Ishlab chiqarishga tayyor to'liq elektron qurilma loyihalarini ishlab chiqamiz.",
+      cap_soft_t: "Dasturlar va ilovalar", cap_soft_d: "Har qanday maqsaddagi qurilma va vazifalar uchun maxsus dastur va ilovalar yozamiz.",
+      cap_banner: "Davlat va xususiy buyurtmalarni qabul qilishga tayyormiz",
       pres_title: "Dastur taqdimoti",
       pres_desc: "Vulkan-SFP karotaj yozuvlari haqiqiyligini qanday himoya qiladi.",
       pres_view: "To'liq ekranda ochish",
@@ -134,6 +162,20 @@ const I18N = {
       footer_text: "© 2026 · Ernazarov J.Q. · Geofizika va elektronika"
     },
     kaa: {
+      nav_search: "Izlew",
+      search_title: "Sayt boyınsha izlew", search_hint: "Sorawdı kiritiń — ónimler, jańalıqlar hám xızmetler boyınsha.",
+      search_none: "Hesh narse tabılmadı.",
+      cart_title: "Sebet", cart_empty: "Sebet bos.", back_shop: "← Xaridtı dawam etiw",
+      order_title: "Buyırtpanı rásmiylestiriw", order_name: "Atıńız", order_phone: "Telefon",
+      order_address: "Jetkerip beriw mánzili", order_comment: "Pikir (erkin)",
+      order_send: "Telegram arqalı buyırtpa beriw",
+      order_note: "Basqannan keyin tayın buyırtpa menen Telegram ashıladı — xabardı jiberiń.",
+      cap_title: "Ne isley alamız",
+      cap_pcb_t: "Baspa platalar", cap_pcb_d: "Qálegen quramalıqtag'ı baspa platalardı joybarlaymız hám islep shıg'amız — eskizden tayın ónimge shekem.",
+      cap_gerber_t: "Sızılmalar hám Gerber", cap_gerber_d: "Qálegen maqsettegi baspa platalar ushın eskiz, sızılma hám Gerber-fayllar jaratamız.",
+      cap_device_t: "Qurılma joybarları", cap_device_d: "Islep shıg'arıwg'a tayın tolıq elektron qurılma joybarların islep shıg'amız.",
+      cap_soft_t: "Bag'darlamalar hám qosımshalar", cap_soft_d: "Qálegen maqsettegi qurılma hám wazıypalar ushın arnawlı bag'darlama hám qosımshalar jazamız.",
+      cap_banner: "Mámleketlik hám jeke buyırtpalardı qabıl etiwge tayınbız",
       pres_title: "Bag'darlama taqdimatı",
       pres_desc: "Vulkan-SFP karotaj jazıwları haqıyqıylıg'ın qalay qorg'aydı.",
       pres_view: "Tolıq ekranda ashıw",
@@ -301,3 +343,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 });
+
+// ═══════════════════════════════════════════════
+//  КОРЗИНА (электроника) + заказ через Telegram
+// ═══════════════════════════════════════════════
+const TG_USERNAME = '998907003038';   // ваш Telegram
+
+const Cart = {
+  items: [],
+  load() {
+    try {
+      const raw = sessionStorage.getItem('itg_cart');
+      this.items = raw ? JSON.parse(raw) : [];
+    } catch (e) { this.items = []; }
+  },
+  save() {
+    try { sessionStorage.setItem('itg_cart', JSON.stringify(this.items)); } catch (e) {}
+    this.updateBadge();
+  },
+  add(title, price) {
+    const ex = this.items.find(i => i.title === title);
+    if (ex) ex.qty += 1;
+    else this.items.push({ title, price: price || '', qty: 1 });
+    this.save();
+  },
+  remove(title) {
+    this.items = this.items.filter(i => i.title !== title);
+    this.save();
+  },
+  setQty(title, qty) {
+    const it = this.items.find(i => i.title === title);
+    if (it) { it.qty = Math.max(1, qty); this.save(); }
+  },
+  count() { return this.items.reduce((s, i) => s + i.qty, 0); },
+  clear() { this.items = []; this.save(); },
+  updateBadge() {
+    document.querySelectorAll('.cart-badge').forEach(b => {
+      const n = this.count();
+      b.textContent = n;
+      b.style.display = n ? 'flex' : 'none';
+    });
+  },
+};
+
+Cart.load();
+document.addEventListener('DOMContentLoaded', () => Cart.updateBadge());

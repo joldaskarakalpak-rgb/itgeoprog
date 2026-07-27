@@ -43,10 +43,17 @@
         <a href="/news.html" data-i18n="nav_news">Новости</a>
         <a href="/about.html" data-i18n="nav_about">О нас</a>
       </div>
-      <div class="lang-switch">
-        <button data-lang="ru">RU</button>
-        <button data-lang="uz">UZ</button>
-        <button data-lang="kaa">QQ</button>
+      <div class="nav-right">
+        <a href="/search.html" class="search-link" title="Поиск" data-i18n-title="nav_search">🔍</a>
+        <a href="/cart.html" class="cart-link" title="Корзина">
+          <span class="cart-icon">🛒</span>
+          <span class="cart-badge">0</span>
+        </a>
+        <div class="lang-switch">
+          <button data-lang="ru">RU</button>
+          <button data-lang="uz">UZ</button>
+          <button data-lang="kaa">QQ</button>
+        </div>
       </div>
     </nav>
   </header>
@@ -108,18 +115,38 @@
     const empty = document.getElementById('cat-empty');
     if (!list.length) { if (empty) empty.style.display = 'block'; return; }
 
-    grid.innerHTML = list.map((p, i) => `
-      <a href="/product.html?n=${i}&cat=${cat}" class="prod-card reveal show">
-        ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
-        <div class="prod-body">
-          <h4>${escapeHtml(p.title || '')}</h4>
-          <p>${escapeHtml(p.summary || '')}</p>
-          ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
-          <span class="prod-stock${p.in_stock === false ? ' out' : ''}">
-            ${p.in_stock === false ? 'нет в наличии' : 'в наличии'}
-          </span>
-        </div>
-      </a>`).join('');
+    grid.innerHTML = list.map((p, i) => {
+      const inStock = p.in_stock !== false;
+      const cartBtn = (cat === 'electronics' && inStock)
+        ? `<button class="add-cart" data-title="${escapeHtml(p.title || '')}" data-price="${escapeHtml(p.price || '')}">В корзину</button>`
+        : '';
+      return `
+      <div class="prod-card reveal show">
+        <a href="/product.html?n=${i}&cat=${cat}" class="prod-link">
+          ${p.image ? `<img src="${fixPath(p.image)}" alt="" loading="lazy">` : '<div class="prod-noimg">📦</div>'}
+          <div class="prod-body">
+            <h4>${escapeHtml(p.title || '')}</h4>
+            <p>${escapeHtml(p.summary || '')}</p>
+            ${p.price ? `<span class="prod-price">${escapeHtml(p.price)}</span>` : ''}
+            <span class="prod-stock${inStock ? '' : ' out'}">
+              ${inStock ? 'в наличии' : 'нет в наличии'}
+            </span>
+          </div>
+        </a>
+        ${cartBtn}
+      </div>`;
+    }).join('');
+
+    // Кнопки «в корзину»
+    grid.querySelectorAll('.add-cart').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        Cart.add(btn.dataset.title, btn.dataset.price);
+        btn.textContent = '✓ Добавлено';
+        btn.classList.add('added');
+        setTimeout(() => { btn.textContent = 'В корзину'; btn.classList.remove('added'); }, 1500);
+      });
+    });
   })();
 </script>
 <script>
